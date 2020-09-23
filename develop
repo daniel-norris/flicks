@@ -42,6 +42,12 @@ if [ $# -gt 0 ]; then
             node \
             npm "$@"
 
+    elif [ "$1" == "npx" ]; then
+        shift 1
+        docker-compose run --rm \
+            node \
+            npx "$@"
+
     elif [ "$1" == "yarn" ]; then
         shift 1
         docker-compose run --rm \
