@@ -16,7 +16,7 @@
                         </svg>
                         <p class="font-bold">{{ $movie['vote_average'] }}<span class="ml-1 font-thin">({{ $movie['vote_count'] }})</span></p>
                     </div>
-                    <a class="hover:text-gray-400" href="#">
+                    <a class="hover:text-gray-400" href="{{ route('movie.show', $movie['id']) }}">
                         <p>{{ $movie['title'] }} </p>
                     </a>
                 </div>
