@@ -72,8 +72,19 @@ class MovieController extends Controller
     {
         dump($id);
 
+        $movieDetails = Http::withToken('eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkNmJiODhlNzAyYmQ5NzllYzNhNjQyZDIwYTM1NTgxOSIsInN1YiI6IjVmNmJjYWQyNjg4Y2QwMDAzNzI4ZDVjMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.VXJ7h4hlTVVq5PorrxGiOnPIG3N5_XRkH-XDxf6bNIg')
+            ->get('https://api.themoviedb.org/3/movie/' . $id)
+            ->json();
+
+        $config = Http::withToken('eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkNmJiODhlNzAyYmQ5NzllYzNhNjQyZDIwYTM1NTgxOSIsInN1YiI6IjVmNmJjYWQyNjg4Y2QwMDAzNzI4ZDVjMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.VXJ7h4hlTVVq5PorrxGiOnPIG3N5_XRkH-XDxf6bNIg')
+            ->get('https://api.themoviedb.org/3/configuration')
+            ->json();
+
+        dump($movieDetails);
+
         return view('show', [
-            'id' => $id,
+            'movie' => $movieDetails,
+            'imgBaseUrl' => $config['images']['base_url'] . $config['images']['backdrop_sizes'][3],
         ]);
     }
 

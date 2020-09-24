@@ -19,4 +19,4 @@ Route::get('/login', function () {
 
 Route::get('/', 'MovieController@index');
 
-Route::get('/movie/{id}', 'MovieController@show');
+Route::get('/movie/{id}', 'MovieController@show')->name('movie.show');
