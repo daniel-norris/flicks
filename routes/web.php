@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,8 +16,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/login', function () {
     return view('welcome');
-});
+})->name('login');
 
 Route::get('/', 'MovieController@index');
 
 Route::get('/movie/{id}', 'MovieController@show')->name('movie.show');
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');

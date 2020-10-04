@@ -15,26 +15,44 @@
             <h1 class="text-gray-300 font-bold text-2xl uppercase leading-none border-l-4 border-blue-500 pl-4">Flicks</h1>
         </a>
         <nav>
-            <ul class="text-sm flex space-x-8">
+            <section class="text-sm flex space-x-8">
                 <a href="#" class="hover:text-gray-400 flex items-center">
                     <svg class="w-6 h-6 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
                       </svg>
-                    <li>Top 50</li>
+                    <p>Top 50</p>
                 </a>
                 <a href="#" class="hover:text-gray-400 flex items-center">
                     <svg class="w-6 h-6 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
                       </svg>
-                    <li>Movies</li>
+                    <p>Movies</p>
                 </a>
-                <a href="#" class="hover:text-gray-400 flex items-center">
-                    <svg class="w-6 h-6 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                      </svg>
-                    <li>Login</li>
-                </a>
-            </ul>
+                @auth
+                    <a href="{{ Auth::logout() }}" class="hover:text-gray-400 flex">
+                        <svg class="w-6 h-6 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        <p>Logout</p>
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" class="hover:text-gray-400 flex">
+                        <svg class="w-6 h-6 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                        </svg>
+                        <p>Login</p>
+                    </a>
+                    @if (Route::has('register'))
+                        <a href="{{ route('register') }}" class="hover:text-gray-400 flex">
+                            <svg class="w-6 h-6 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                            </svg>
+                            <p>Register</p>
+                        </a>
+                    @endif
+                @endauth
+
+            </section>
         </nav>
     </header>
 

@@ -66,10 +66,10 @@
         <h2 class="mt-8 text-gray-300 font-bold text-lg uppercase leading-none border-l-4 border-blue-500 pl-4">Reviews</h2>
         <div class="flex flex-wrap mt-4">
             @isset($firstReview)
-                <h1>by <span class="font-bold">{{ $firstReview['author'] }}</span></h1>
+                <h1>by <span class="font-bold text-blue-500">{{ $firstReview['author'] }}</span></h1>
                 <div class="mt-4">
                     @foreach ($firstReviewContent as $review)
-                        <p class="leading-loose text-sm font-thin">{{ $review }}</p>
+                        <p class="mt-2 leading-loose text-sm font-thin">{{ $review }}</p>
                     @endforeach
                 </div>
                 <div class="flex space-x-2 mt-4">
