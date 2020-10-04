@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-{{ dump($firstReviewContent)}}
+{{-- {{ dump($asd) }} --}}
 
 @section('content')
     <div class="mx-auto container mt-8">
@@ -67,10 +67,15 @@
         <div class="flex flex-wrap mt-4">
             @isset($firstReview)
                 <h1>by <span class="font-bold">{{ $firstReview['author'] }}</span></h1>
-                <div>
+                <div class="mt-4">
                     @foreach ($firstReviewContent as $review)
-                        <p class="mt-4 text-sm font-thin">{{ $review }}</p>
+                        <p class="leading-loose text-sm font-thin">{{ $review }}</p>
                     @endforeach
+                </div>
+                <div class="flex space-x-2 mt-4">
+                    <a class="text-blue-500 hover:underline font-semibold" href="#">Leave a review</a>
+                    <span>&vert;</span>
+                    <a class="text-blue-500 hover:underline font-semibold" href="#">{{ "See all " . " reviews"}}</a>
                 </div>
             @endisset
             @empty($firstReview)

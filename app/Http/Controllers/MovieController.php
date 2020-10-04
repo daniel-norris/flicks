@@ -120,6 +120,7 @@ class MovieController extends Controller
             'trailers' => $trailersFiltered,
             'images' => collect($movieImages['backdrops'])->take(6),
             'featureImage' => $highestRatedImage,
+            // 'asd' => $movieReviews,
             'firstReview' => collect($movieReviews['results'])->first(),
             'firstReviewContent' => Str::of($movieReviews['results'][0]['content'])->explode("\r\n"),
             'imgBaseUrl' => $config['images']['base_url'] . $config['images']['poster_sizes'][5],
