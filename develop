@@ -1,22 +1,12 @@
 #!/usr/bin/env bash
 
-# this checks to see if an arg after the executable is greater than 0
-# then its just a basic if else statement
-#!/usr/bin/env bash
-
 if [ $# -gt 0 ]; then
-
-    # checking for the first command which is the $1 variable
     if [ "$1" == "start" ]; then
         docker-compose up -d
 
     elif [ "$1" == "stop" ]; then
         docker-compose down
 
-    # looks for artisan or art
-    # then shifts or removes the 1 variable
-    # runs docker compose etc
-    # then injects everything after artisan or art where $@ variable is
     elif [ "$1" == "artisan" ] || [ "$1" == "art" ]; then
         shift 1
         docker-compose exec \
@@ -35,7 +25,6 @@ if [ $# -gt 0 ]; then
             app \
             ./vendor/bin/phpunit "$@"
 
-    # different command here runs 'run' instead of exec
     elif [ "$1" == "npm" ]; then
         shift 1
         docker-compose run --rm \
