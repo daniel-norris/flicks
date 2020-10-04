@@ -1,18 +1,18 @@
 @extends('layouts.app')
 
-
+{{ dump($firstReviewContent)}}
 
 @section('content')
     <div class="mx-auto container mt-8">
-        <div class="flex">
-            <div class="w-64 mr-6">
-                <img src="{{ $imgBaseUrl . $movie['poster_path'] }}" alt="">
+        <div class="flex h-64">
+            <div class="w-64">
+                <img class="h-full" src="{{ $imgBaseUrl . $movie['poster_path'] }}" alt="">
             </div>
             @isset($trailers)
-                <div class="relative w-64 mr-6">
+                <div class="relative w-64 mr-6 hover:opacity-75">
                     <a href="{{ 'https://www.youtube.com/watch?v=' . $trailers['key'] }}">
-                        <img class="z-0 h-full object-cover opacity-50 hover:opacity-75" src="{{ $imgBaseUrl . $featureImage['file_path'] }}" alt="">
-                        <svg class="w-full absolute top-0 left-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <img class="h-full object-cover opacity-50" src="{{ $imgBaseUrl . $featureImage['file_path'] }}" alt="">
+                        <svg class="h-1/2 absolute top-0 left-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
@@ -56,12 +56,26 @@
             @endforeach
         </div>
         <h2 class="mt-8 text-gray-300 font-bold text-lg uppercase leading-none border-l-4 border-blue-500 pl-4">Photos</h2>
-        <div class="flex flex-wrap space-y-2 mt-4">
-            @foreach ($images['backdrops'] as $image)
+        <div class="flex flex-wrap mt-4">
+            @foreach ($images as $image)
                 <a href="#" class="w-1/6 hover:opacity-75">
                     <img src="{{ $imgBaseUrl . $image['file_path'] }}" alt="">
                 </a>
             @endforeach
+        </div>
+        <h2 class="mt-8 text-gray-300 font-bold text-lg uppercase leading-none border-l-4 border-blue-500 pl-4">Reviews</h2>
+        <div class="flex flex-wrap mt-4">
+            @isset($firstReview)
+                <h1>by <span class="font-bold">{{ $firstReview['author'] }}</span></h1>
+                <div>
+                    @foreach ($firstReviewContent as $review)
+                        <p class="mt-4 text-sm font-thin">{{ $review }}</p>
+                    @endforeach
+                </div>
+            @endisset
+            @empty($firstReview)
+                <p>There are no reviews. Be the first and leave a review now.</p>
+            @endempty
         </div>
     </div>
 @endsection
