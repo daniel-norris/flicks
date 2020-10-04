@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
 
 class MovieController extends Controller
@@ -70,21 +72,58 @@ class MovieController extends Controller
      */
     public function show($id)
     {
-        dump($id);
-
         $movieDetails = Http::withToken('eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkNmJiODhlNzAyYmQ5NzllYzNhNjQyZDIwYTM1NTgxOSIsInN1YiI6IjVmNmJjYWQyNjg4Y2QwMDAzNzI4ZDVjMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.VXJ7h4hlTVVq5PorrxGiOnPIG3N5_XRkH-XDxf6bNIg')
             ->get('https://api.themoviedb.org/3/movie/' . $id)
+            ->json();
+
+        $movieCredits = Http::withToken('eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkNmJiODhlNzAyYmQ5NzllYzNhNjQyZDIwYTM1NTgxOSIsInN1YiI6IjVmNmJjYWQyNjg4Y2QwMDAzNzI4ZDVjMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.VXJ7h4hlTVVq5PorrxGiOnPIG3N5_XRkH-XDxf6bNIg')
+            ->get('https://api.themoviedb.org/3/movie/' . $id . '/credits')
+            ->json();
+
+        $movieVideos = Http::withToken('eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkNmJiODhlNzAyYmQ5NzllYzNhNjQyZDIwYTM1NTgxOSIsInN1YiI6IjVmNmJjYWQyNjg4Y2QwMDAzNzI4ZDVjMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.VXJ7h4hlTVVq5PorrxGiOnPIG3N5_XRkH-XDxf6bNIg')
+            ->get('https://api.themoviedb.org/3/movie/' . $id . '/videos')
+            ->json();
+
+        $movieImages = Http::withToken('eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkNmJiODhlNzAyYmQ5NzllYzNhNjQyZDIwYTM1NTgxOSIsInN1YiI6IjVmNmJjYWQyNjg4Y2QwMDAzNzI4ZDVjMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.VXJ7h4hlTVVq5PorrxGiOnPIG3N5_XRkH-XDxf6bNIg')
+            ->get('https://api.themoviedb.org/3/movie/' . $id . '/images')
+            ->json();
+
+        $movieReviews = Http::withToken('eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkNmJiODhlNzAyYmQ5NzllYzNhNjQyZDIwYTM1NTgxOSIsInN1YiI6IjVmNmJjYWQyNjg4Y2QwMDAzNzI4ZDVjMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.VXJ7h4hlTVVq5PorrxGiOnPIG3N5_XRkH-XDxf6bNIg')
+            ->get('https://api.themoviedb.org/3/movie/' . $id . '/reviews')
             ->json();
 
         $config = Http::withToken('eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkNmJiODhlNzAyYmQ5NzllYzNhNjQyZDIwYTM1NTgxOSIsInN1YiI6IjVmNmJjYWQyNjg4Y2QwMDAzNzI4ZDVjMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.VXJ7h4hlTVVq5PorrxGiOnPIG3N5_XRkH-XDxf6bNIg')
             ->get('https://api.themoviedb.org/3/configuration')
             ->json();
 
-        dump($movieDetails);
+        dump($movieReviews);
+
+        $trailers = collect($movieVideos['results'])->map(function ($video) {
+            return $video;
+        });
+
+        $trailersFiltered = $trailers->filter(function ($trailer) {
+            return $trailer['type'] === 'Trailer';
+        });
+
+        $trailersFiltered = $trailersFiltered->first();
+
+        $highestRatedImage = collect($movieImages['backdrops'])->where('vote_count', '>', 1)->first();
+
+        $test = 'asdfasdfasfsda \n asdfdasfdsafsasdfasd\nsafadsfasdfa';
+        $test = Str::of($test)->explode('\n');
+        dump($test);
 
         return view('show', [
             'movie' => $movieDetails,
-            'imgBaseUrl' => $config['images']['base_url'] . $config['images']['backdrop_sizes'][3],
+            'cast' => collect($movieCredits['cast'])->take(6),
+            'trailers' => $trailersFiltered,
+            'images' => collect($movieImages['backdrops'])->take(6),
+            'featureImage' => $highestRatedImage,
+            // 'asd' => $movieReviews,
+            'firstReview' => collect($movieReviews['results'])->first(),
+            'firstReviewContent' => Str::of($movieReviews['results'][0]['content'])->explode("\r\n"),
+            'imgBaseUrl' => $config['images']['base_url'] . $config['images']['poster_sizes'][5],
         ]);
     }
 

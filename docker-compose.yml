@@ -1,91 +1,67 @@
-# the latest version of Docker Compose
 version: '3.2'
 
-# this is where we define the containers that we are going to run
-# e.g. mysql, a redis service and app container
 services:
     app:
-        # we're just re-creating the build command we used earlier
-        # the -t is the image key below
-        # and the rest of the command is the context and dockerfile keys
         build:
             context: ./docker/app
             dockerfile: Dockerfile
-        image: shippingdocker/app:latest
+        image: norrisdan/php:latest
         networks:
-            - appnet
-        # you can use relative file paths in docker-compose and we're using a relative path to the docker-compose.yml file
+            - net
         volumes:
             - .:/var/www/html
-        # ports localhost 8080 to port 80 in the container
         ports:
             - ${APP_PORT}:80
-        # setting a working directory as we were doing in the CLI
         working_dir: /var/www/html
-    # we're calling this service after its use case but its run using redis
     cache:
         image: redis:alpine
-        # this creates a service, e.g. a container, and puts it on the appnet network
         networks:
-            - appnet
-        # this maps our cachedata volume to where redis volume is stored
-        # you can check this for any service by going to Docker Hub and searching for the image and version and looking at the Dockerfile
+            - net
         volumes:
             - cachedata:/data
 
     db:
         image: mysql:5.7
-        # you can set your env variables here
         environment:
-            # these are only used the first time you spin up a mysql container that doesn't have a volume attached
-            MYSQL_ROOT_PASSWORD: secret
-            MYSQL_DATABASE: homestead
-            MYSQL_USER: homestead
-            MYSQL_PASSWORD: secret
-        # we're only setting a port here so that we can connect to our db using a client like sequel pro
+            MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
         ports:
             - ${DB_PORT}:3306
         networks:
-            - appnet
-        # this maps our dbdata volume to where mysql is stored
+            - net
         volumes:
             - dbdata:/var/lib/mysql
 
     node:
         build:
             context: ./docker/node
-            # for some reason this is different to the way we set up app above
             dockerfile: Dockerfile
-        image: shippingdocker/node:latest
+        image: norrisdan/node:latest
         networks:
-            - appnet
+            - net
         volumes:
             - .:/opt
         working_dir: /opt
         command: echo hi
 
-    # this is working but not connecting as expected
     phpmyadmin:
         image: phpmyadmin
         restart: always
         ports:
-            - 8080:80
+            - ${PMA_PORT}:80
         environment:
             - PMA_HOST=db
         networks:
-            - appnet
+            - net
 
-# we are going to tell Docker what networks our containers are going connect to
 networks:
-    appnet:
-        # we're being explicit but it is the default and not normally necessary
+    net:
         driver: bridge
 
-#
 volumes:
     dbdata:
-        # local is the default driver and you don't necessarily need to define it but we are being explicit here
         driver: local
-        # this is for our redis container
     cachedata:
         driver: local
