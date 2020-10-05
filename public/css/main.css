@@ -19266,6 +19266,10 @@ video {
   grid-template-rows: none;
 }
 
+.grid-rows-layout {
+  grid-template-rows: auto 800px auto;
+}
+
 .row-auto {
   grid-row: auto;
 }
@@ -39915,6 +39919,10 @@ video {
     grid-template-rows: none;
   }
 
+  .sm\:grid-rows-layout {
+    grid-template-rows: auto 800px auto;
+  }
+
   .sm\:row-auto {
     grid-row: auto;
   }
@@ -60497,6 +60505,10 @@ video {
 
   .md\:grid-rows-none {
     grid-template-rows: none;
+  }
+
+  .md\:grid-rows-layout {
+    grid-template-rows: auto 800px auto;
   }
 
   .md\:row-auto {
@@ -81083,6 +81095,10 @@ video {
     grid-template-rows: none;
   }
 
+  .lg\:grid-rows-layout {
+    grid-template-rows: auto 800px auto;
+  }
+
   .lg\:row-auto {
     grid-row: auto;
   }
@@ -101665,6 +101681,10 @@ video {
 
   .xl\:grid-rows-none {
     grid-template-rows: none;
+  }
+
+  .xl\:grid-rows-layout {
+    grid-template-rows: auto 800px auto;
   }
 
   .xl\:row-auto {
