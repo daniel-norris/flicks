@@ -16,7 +16,6 @@ class MovieController extends Controller
      */
     public function index()
     {
-
         $moviesTopRated = Http::withToken('eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkNmJiODhlNzAyYmQ5NzllYzNhNjQyZDIwYTM1NTgxOSIsInN1YiI6IjVmNmJjYWQyNjg4Y2QwMDAzNzI4ZDVjMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.VXJ7h4hlTVVq5PorrxGiOnPIG3N5_XRkH-XDxf6bNIg')
             ->post('https://api.themoviedb.org/3/movie/top_rated')
             ->json();
@@ -25,17 +24,11 @@ class MovieController extends Controller
             ->get('https://api.themoviedb.org/3/configuration')
             ->json();
 
-        dump($config);
-
-        dump($moviesTopRated);
-
         $movies = collect($moviesTopRated['results'])->filter(function ($movie) {
             return $movie['adult'] === false
                 && $movie['original_language'] === 'en'
                 && $movie['popularity'] > 20;
         })->take(6);
-
-        dump($movies);
 
         return view('index', [
             'movies' => $movies,
@@ -96,31 +89,20 @@ class MovieController extends Controller
             ->get('https://api.themoviedb.org/3/configuration')
             ->json();
 
-        dump($movieReviews);
-
         $trailers = collect($movieVideos['results'])->map(function ($video) {
             return $video;
-        });
-
-        $trailersFiltered = $trailers->filter(function ($trailer) {
+        })->filter(function ($trailer) {
             return $trailer['type'] === 'Trailer';
-        });
-
-        $trailersFiltered = $trailersFiltered->first();
+        })->first();
 
         $highestRatedImage = collect($movieImages['backdrops'])->where('vote_count', '>', 1)->first();
-
-        $test = 'asdfasdfasfsda \n asdfdasfdsafsasdfasd\nsafadsfasdfa';
-        $test = Str::of($test)->explode('\n');
-        dump($test);
 
         return view('show', [
             'movie' => $movieDetails,
             'cast' => collect($movieCredits['cast'])->take(6),
-            'trailers' => $trailersFiltered,
+            'trailers' => $trailers,
             'images' => collect($movieImages['backdrops'])->take(6),
             'featureImage' => $highestRatedImage,
-            // 'asd' => $movieReviews,
             'firstReview' => collect($movieReviews['results'])->first(),
             'firstReviewContent' => Str::of($movieReviews['results'][0]['content'])->explode("\r\n"),
             'imgBaseUrl' => $config['images']['base_url'] . $config['images']['poster_sizes'][5],

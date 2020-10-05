@@ -64,7 +64,7 @@
             @endforeach
         </div>
         <h2 class="mt-8 text-gray-300 font-bold text-lg uppercase leading-none border-l-4 border-blue-500 pl-4">Reviews</h2>
-        <div class="flex flex-wrap mt-4">
+        <div class="mt-4">
             @isset($firstReview)
                 <h1>by <span class="font-bold text-blue-500">{{ $firstReview['author'] }}</span></h1>
                 <div class="mt-4">
