@@ -4,7 +4,7 @@
 <div class="container mx-auto flex justify-center">
     <div class="mt-12">
         @if (session('status'))
-            <div class="text-blue-500 font-bold text-sm" role="alert">
+            <div class="text-blue-500 font-bold text-sm mb-4" role="alert">
                 {{ session('status') }}
             </div>
         @endif
