@@ -2,8 +2,22 @@
 
 @section('content')
 
-    <div class="mx-auto container mt-8">
+    <div class="relative h-screen flex justify-center items-center">
+        <img class="w-full h-full opacity-50 shadow-md" src="{{ asset('images/landing.jpg') }}" alt="">
+        <div class="absolute inset-auto">
+            <h1 class="text-blue-500 font-bold text-3xl">Search across 1000's of movies and tv shows.</h1>
+            <form class="mt-8" method="POST" action="{{ route('search') }}">
+                @csrf
+                <label for=""></label>
+                <input class="shadow appearance-none border rounded w-3/4 py-2 px-3 text-gray-700 leading-light focus:outline-none focus:shadow-outline" placeholder="Search now..." name="search" type="text">
+                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                    Search
+                </button>
+            </form>
+        </div>
+    </div>
 
+    <div class="mx-auto container mt-8">
         <h2 class="text-gray-300 font-bold text-lg uppercase leading-none border-l-4 border-blue-500 pl-4">Highest Rated</h2>
         <div class="grid grid-cols-6 grid-rows-2 gap-4 mt-8">
             @foreach ($movies as $movie)

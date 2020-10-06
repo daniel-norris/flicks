@@ -1,7 +1,5 @@
 @extends('layouts.app')
 
-{{-- {{ dump($asd) }} --}}
-
 @section('content')
     <div class="mx-auto container mt-8">
         <div class="flex h-64">
