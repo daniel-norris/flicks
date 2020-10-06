@@ -1,7 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
+
     <div class="mx-auto container mt-8">
+
         <h2 class="text-gray-300 font-bold text-lg uppercase leading-none border-l-4 border-blue-500 pl-4">Highest Rated</h2>
         <div class="grid grid-cols-6 grid-rows-2 gap-4 mt-8">
             @foreach ($movies as $movie)

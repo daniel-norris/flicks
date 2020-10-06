@@ -16,11 +16,11 @@ class MovieController extends Controller
      */
     public function index()
     {
-        $moviesTopRated = Http::withToken('eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkNmJiODhlNzAyYmQ5NzllYzNhNjQyZDIwYTM1NTgxOSIsInN1YiI6IjVmNmJjYWQyNjg4Y2QwMDAzNzI4ZDVjMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.VXJ7h4hlTVVq5PorrxGiOnPIG3N5_XRkH-XDxf6bNIg')
+        $moviesTopRated = Http::withToken(env('API_KEY'))
             ->post('https://api.themoviedb.org/3/movie/top_rated')
             ->json();
 
-        $config = Http::withToken('eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkNmJiODhlNzAyYmQ5NzllYzNhNjQyZDIwYTM1NTgxOSIsInN1YiI6IjVmNmJjYWQyNjg4Y2QwMDAzNzI4ZDVjMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.VXJ7h4hlTVVq5PorrxGiOnPIG3N5_XRkH-XDxf6bNIg')
+        $config = Http::withToken(env('API_KEY'))
             ->get('https://api.themoviedb.org/3/configuration')
             ->json();
 
@@ -65,27 +65,27 @@ class MovieController extends Controller
      */
     public function show($id)
     {
-        $movieDetails = Http::withToken('eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkNmJiODhlNzAyYmQ5NzllYzNhNjQyZDIwYTM1NTgxOSIsInN1YiI6IjVmNmJjYWQyNjg4Y2QwMDAzNzI4ZDVjMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.VXJ7h4hlTVVq5PorrxGiOnPIG3N5_XRkH-XDxf6bNIg')
+        $movieDetails = Http::withToken(env('API_KEY'))
             ->get('https://api.themoviedb.org/3/movie/' . $id)
             ->json();
 
-        $movieCredits = Http::withToken('eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkNmJiODhlNzAyYmQ5NzllYzNhNjQyZDIwYTM1NTgxOSIsInN1YiI6IjVmNmJjYWQyNjg4Y2QwMDAzNzI4ZDVjMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.VXJ7h4hlTVVq5PorrxGiOnPIG3N5_XRkH-XDxf6bNIg')
+        $movieCredits = Http::withToken(env('API_KEY'))
             ->get('https://api.themoviedb.org/3/movie/' . $id . '/credits')
             ->json();
 
-        $movieVideos = Http::withToken('eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkNmJiODhlNzAyYmQ5NzllYzNhNjQyZDIwYTM1NTgxOSIsInN1YiI6IjVmNmJjYWQyNjg4Y2QwMDAzNzI4ZDVjMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.VXJ7h4hlTVVq5PorrxGiOnPIG3N5_XRkH-XDxf6bNIg')
+        $movieVideos = Http::withToken(env('API_KEY'))
             ->get('https://api.themoviedb.org/3/movie/' . $id . '/videos')
             ->json();
 
-        $movieImages = Http::withToken('eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkNmJiODhlNzAyYmQ5NzllYzNhNjQyZDIwYTM1NTgxOSIsInN1YiI6IjVmNmJjYWQyNjg4Y2QwMDAzNzI4ZDVjMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.VXJ7h4hlTVVq5PorrxGiOnPIG3N5_XRkH-XDxf6bNIg')
+        $movieImages = Http::withToken(env('API_KEY'))
             ->get('https://api.themoviedb.org/3/movie/' . $id . '/images')
             ->json();
 
-        $movieReviews = Http::withToken('eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkNmJiODhlNzAyYmQ5NzllYzNhNjQyZDIwYTM1NTgxOSIsInN1YiI6IjVmNmJjYWQyNjg4Y2QwMDAzNzI4ZDVjMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.VXJ7h4hlTVVq5PorrxGiOnPIG3N5_XRkH-XDxf6bNIg')
+        $movieReviews = Http::withToken(env('API_KEY'))
             ->get('https://api.themoviedb.org/3/movie/' . $id . '/reviews')
             ->json();
 
-        $config = Http::withToken('eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkNmJiODhlNzAyYmQ5NzllYzNhNjQyZDIwYTM1NTgxOSIsInN1YiI6IjVmNmJjYWQyNjg4Y2QwMDAzNzI4ZDVjMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.VXJ7h4hlTVVq5PorrxGiOnPIG3N5_XRkH-XDxf6bNIg')
+        $config = Http::withToken(env('API_KEY'))
             ->get('https://api.themoviedb.org/3/configuration')
             ->json();
 
