@@ -22,6 +22,8 @@ Route::get('/', 'MovieController@index');
 
 Route::get('/movie/{id}', 'MovieController@show')->name('movie.show');
 
+Route::post('/search', 'SearchController@index')->name('search');
+
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
