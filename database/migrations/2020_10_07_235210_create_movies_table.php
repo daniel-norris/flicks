@@ -18,15 +18,15 @@ class CreateMoviesTable extends Migration
             $table->string('title', 100);
             $table->string('backdrop_path', 200)->nullable();
             $table->string('poster_path', 200)->nullable();
-            $table->integer('budget');
+            $table->integer('budget')->nullable();
             $table->text('overview')->nullable();
-            $table->float('popularity', 3, 1);
-            $table->date('release_date');
-            $table->integer('revenue');
+            $table->float('popularity', 3, 1)->nullable();
+            $table->date('release_date')->nullable();
+            $table->integer('revenue')->nullable();
             $table->integer('runtime')->nullable();
-            $table->string('status', 100);
-            $table->float('vote_average', 3, 1);
-            $table->integer('vote_count');
+            $table->string('status', 100)->nullable();
+            $table->float('vote_average', 3, 1)->nullable();
+            $table->integer('vote_count')->nullable();
             $table->timestamps();
         });
     }

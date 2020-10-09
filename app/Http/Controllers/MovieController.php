@@ -89,6 +89,8 @@ class MovieController extends Controller
             ->get('https://api.themoviedb.org/3/configuration')
             ->json();
 
+        dump($movieDetails);
+
         $trailers = collect($movieVideos['results'])->map(function ($video) {
             return $video;
         })->filter(function ($trailer) {
