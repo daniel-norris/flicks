@@ -89,6 +89,8 @@ class MovieController extends Controller
             ->get('https://api.themoviedb.org/3/configuration')
             ->json();
 
+        dump($movieDetails);
+
         $trailers = collect($movieVideos['results'])->map(function ($video) {
             return $video;
         })->filter(function ($trailer) {
@@ -97,6 +99,8 @@ class MovieController extends Controller
 
         $highestRatedImage = collect($movieImages['backdrops'])->where('vote_count', '>', 1)->first();
 
+        $firstReviewContent = $movieReviews['results'] ? Str::of($movieReviews['results'][0]['content'])->explode("\r\n") : null;
+
         return view('show', [
             'movie' => $movieDetails,
             'cast' => collect($movieCredits['cast'])->take(6),
@@ -104,7 +108,7 @@ class MovieController extends Controller
             'images' => collect($movieImages['backdrops'])->take(6),
             'featureImage' => $highestRatedImage,
             'firstReview' => collect($movieReviews['results'])->first(),
-            'firstReviewContent' => Str::of($movieReviews['results'][0]['content'])->explode("\r\n"),
+            'firstReviewContent' => $firstReviewContent,
             'imgBaseUrl' => $config['images']['base_url'] . $config['images']['poster_sizes'][5],
         ]);
     }
