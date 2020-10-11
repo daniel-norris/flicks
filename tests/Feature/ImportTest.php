@@ -3,8 +3,11 @@
 namespace Tests\Feature;
 
 use App\Import;
+use App\Movie;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -14,8 +17,10 @@ class ImportTest extends TestCase
 
     public function testRequestDataDump()
     {
-        $client = new \GuzzleHttp\Client();
-        $client->get('http://files.tmdb.org/p/exports/movie_ids_09_09_2020.json.gz', ['save_to' => storage_path() . '/app/imports/testFile.json.gz']);
+        // disabled during development
+
+        // $client = new \GuzzleHttp\Client();
+        // $client->get('http://files.tmdb.org/p/exports/movie_ids_09_09_2020.json.gz', ['save_to' => storage_path() . '/app/imports/testFile.json.gz']);
 
         Storage::disk('local')->assertExists('/imports/testFile.json.gz');
         // Storage::disk('local')->delete('/imports/testFile.json.gz');
@@ -115,23 +120,65 @@ class ImportTest extends TestCase
 
         $chunks->map(function ($value) {
             $insert = new Import;
-            $insert->id = $value->id;
-            $insert->adult = $value->adult;
-            $insert->original_title = $value->original_title;
-            $insert->popularity = $value->popularity;
+            $insert->id = $value->id ? $value->id : null;
+            $insert->adult = $value->adult ? $value->adult : null;
+            $insert->original_title = $value->original_title ? $value->original_title : null;
+            $insert->popularity = $value->popularity ? $value->popularity : null;
             $insert->save();
         });
 
-        $secondValue = Import::find(2)->original_title;
+        // echo dump($chunks);
 
-        $this->assertEquals("Ariel", $secondValue);
+
+
+        // $secondValue = Import::find(2)->original_title;
+
+        // $this->assertEquals("Ariel", $secondValue);
+
+        // $all = Import::all();
+
+        // echo dump($all);
+
+        // $this->assertCount(100, $all);
 
         $all = Import::all();
 
-        $this->assertCount(100, $all);
+        $ids = $all->map(function ($value) {
+            return $value->id;
+        });
 
-        return $chunks;
+        // dump($ids);
+
+        $ids->map(function ($id) {
+            $movie = Http::withToken(env('API_KEY'))
+                ->get('https://api.themoviedb.org/3/movie/' . $id)
+                ->json();
+
+            dump($movie);
+
+            $insert = new Movie;
+            $insert->id = $movie->id;
+            $insert->title = $movie
+            $insert->save();
+        });
+
+
+        // echo dump(Movie::all());
     }
 
-    
+    /**
+     * @depends testSaveChunkedDataToImportModel
+     */
+    public function testMakeChunkHttpRequests()
+    {
+        // $test = Import::find(2);
+        // dump($test);
+        // $this->assertEquals(2, $all->id);
+
+        // echo dump($all);
+
+        // foreach ($all->original as $each) {
+        //     echo dump($each->name);
+        // }
+    }
 }

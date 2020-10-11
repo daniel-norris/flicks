@@ -15,9 +15,9 @@ class CreateImportsTable extends Migration
     {
         Schema::create('imports', function (Blueprint $table) {
             $table->id();
-            $table->boolean('adult');
-            $table->string('original_title', 100);
-            $table->decimal('popularity', 6, 3);
+            $table->boolean('adult')->nullable();
+            $table->string('original_title', 600)->nullable();
+            $table->decimal('popularity', 10, 4)->nullable();
             $table->timestamps();
         });
     }
