@@ -2,20 +2,17 @@
 
 namespace Tests\Feature;
 
+use App\Import;
+use App\Movie;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
-use ZipArchive;
 
 class ImportTest extends TestCase
 {
     use RefreshDatabase;
-    /**
-     * A basic feature test example.
-     *
-     * @return void
-     */
+
     public function testMovieDataDump()
     {
         $client = new \GuzzleHttp\Client();
@@ -23,12 +20,12 @@ class ImportTest extends TestCase
 
         Storage::disk('local')->assertExists('/imports/testFile.json.gz');
         // Storage::disk('local')->delete('/imports/testFile.json.gz');
-        Storage::disk('local')->assertMissing('/imports/testFile.json');;
+        // Storage::disk('local')->assertMissing('/imports/testFile.json');;
     }
 
     public function testDumpUnzip()
     {
-        $file_name = 'storage/app/imports/testFile.json.gz';
+        $file_name = storage_path() . '/app/imports/testFile.json.gz';
 
         $buffer_size = 4096;
         $out_file_name = str_replace('.gz', '', $file_name);
@@ -44,7 +41,63 @@ class ImportTest extends TestCase
         gzclose($file);
 
         Storage::disk('local')->assertExists('/imports/testFile.json');
-        Storage::disk('local')->delete('/imports/testFile.json');
-        Storage::disk('local')->assertMissing('/imports/testFile.json');
+        // Storage::disk('local')->delete('/imports/testFile.json');
+        // Storage::disk('local')->assertMissing('/imports/testFile.json');
+    }
+
+    public function testParseFile()
+    {
+        $file = storage_path() . '/app/imports/testFile.json';
+
+        $fopen = fopen($file, 'r');
+        $fread = fread($fopen, filesize($file));
+
+        fclose($fopen);
+
+        $this->assertIsString($fread);
+
+        return $fread;
+    }
+
+    /**
+     * @depends testParseFileAndConvertToArray
+     */
+    public function testConvertFileToArray(string $fread)
+    {
+        $stack = [];
+
+        $remove = "\n";
+        $split = explode($remove, $fread);
+
+        foreach ($split as $string) {
+            $row = json_decode($string);
+            array_push($stack, $row);
+        }
+
+        $this->assertIsArray($stack);
+        $this->assertEquals($stack[0]->original_title, 'Blondie');
+
+        return $stack;
+    }
+
+    /**
+     * @depends testConvertDumpFileToArray
+     */
+    public function testSaveDataToImportModel(array $stack)
+    {
+        $import = new Import;
+
+        $import->adult = 0;
+        $import->id = $stack[0]->id;
+        $import->original_title = $stack[0]->original_title;
+        $import->popularity = $stack[0]->popularity;
+        $import->save();
+
+        $result = Import::find(3924);
+
+        $this->assertEquals($result->adult, 0);
+        $this->assertEquals($result->id, 3924);
+        $this->assertEquals($result->original_title, "Blondie");
+        $this->assertEquals($result->popularity, 2.744);
     }
 }
