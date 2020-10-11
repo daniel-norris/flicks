@@ -9,7 +9,7 @@ class Import extends Model
 {
     protected $guarded = [];
 
-    public function unzip(string $date = ""): void
+    public function unzipGz(string $date = null): string
     {
         $dateFormat = $date ?  $date : date('m_d_Y');
 
@@ -27,5 +27,21 @@ class Import extends Model
 
         fclose($output);
         gzclose($file);
+
+        echo "\e[0;30;42mCreated: " . str_replace('storage/app/imports/', '', $outputFilename) . "\e[0m";
+        return $outputFilename;
+    }
+
+    public function parseFile(string $path = null): string
+    {
+        $date = date('m_d_Y');
+        $file = $path ? $path : 'storage/app/imports/movie_ids_' . $date . '.json.gz';
+
+        $fileOpen = fopen($file, 'r');
+        $fileRead = fread($fileOpen, filesize($file));
+
+        fclose($fileOpen);
+
+        return $fileRead;
     }
 }
