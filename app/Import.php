@@ -9,9 +9,11 @@ class Import extends Model
 {
     protected $guarded = [];
 
-    public function unzip(string $path): string
+    public function unzip(string $date = ""): void
     {
-        $filename = $path;
+        $dateFormat = $date ?  $date : date('m_d_Y');
+
+        $filename = 'storage/app/imports/movie_ids_' . $date . '.json.gz';
 
         $bufferSize = 4096;
         $outputFilename = str_replace('.gz', '', $filename);
@@ -25,7 +27,5 @@ class Import extends Model
 
         fclose($output);
         gzclose($file);
-
-        // return Storage::url('/imports/testFile.json');
     }
 }
