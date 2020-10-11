@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Import;
-use App\Movie;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Storage;
@@ -13,7 +12,7 @@ class ImportTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testMovieDataDump()
+    public function testRequestDataDump()
     {
         $client = new \GuzzleHttp\Client();
         $client->get('http://files.tmdb.org/p/exports/movie_ids_09_09_2020.json.gz', ['save_to' => storage_path() . '/app/imports/testFile.json.gz']);
@@ -23,7 +22,7 @@ class ImportTest extends TestCase
         // Storage::disk('local')->assertMissing('/imports/testFile.json');;
     }
 
-    public function testDumpUnzip()
+    public function testUnzipDump()
     {
         $file_name = storage_path() . '/app/imports/testFile.json.gz';
 
@@ -60,7 +59,7 @@ class ImportTest extends TestCase
     }
 
     /**
-     * @depends testParseFileAndConvertToArray
+     * @depends testParseFile
      */
     public function testConvertFileToArray(string $fread)
     {
@@ -81,7 +80,7 @@ class ImportTest extends TestCase
     }
 
     /**
-     * @depends testConvertDumpFileToArray
+     * @depends testConvertFileToArray
      */
     public function testSaveDataToImportModel(array $stack)
     {
@@ -99,5 +98,40 @@ class ImportTest extends TestCase
         $this->assertEquals($result->id, 3924);
         $this->assertEquals($result->original_title, "Blondie");
         $this->assertEquals($result->popularity, 2.744);
+
+        return $stack;
     }
+
+    /**
+     * @depends testSaveDataToImportModel
+     */
+    public function testSaveChunkedDataToImportModel(array $stack)
+    {
+        $collection = collect($stack);
+
+        $chunks = $collection->take(100);
+
+        $this->assertCount(100, $chunks);
+
+        $chunks->map(function ($value) {
+            $insert = new Import;
+            $insert->id = $value->id;
+            $insert->adult = $value->adult;
+            $insert->original_title = $value->original_title;
+            $insert->popularity = $value->popularity;
+            $insert->save();
+        });
+
+        $secondValue = Import::find(2)->original_title;
+
+        $this->assertEquals("Ariel", $secondValue);
+
+        $all = Import::all();
+
+        $this->assertCount(100, $all);
+
+        return $chunks;
+    }
+
+    
 }
