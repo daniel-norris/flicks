@@ -171,12 +171,12 @@ class ImportTest extends TestCase
         $this->assertEquals("/jOuCWdh0BE6XPu2Vpjl08wDAeFz.jpg", $result->backdrop_path);
     }
 
-    // public function testCleanUpGzipAndJsonFiles()
-    // {
-    //     Storage::delete('/imports/testFile.json.gz');
-    //     Storage::disk('local')->assertMissing('/imports/testFile.json.gz');
+    public function testCleanUpGzipAndJsonFiles()
+    {
+        Storage::delete('/imports/testFile.json.gz');
+        Storage::disk('local')->assertMissing('/imports/testFile.json.gz');
 
-    //     Storage::delete('/imports/testFile.json');
-    //     Storage::disk('local')->assertMissing('/imports/testFile.json');
-    // }
+        Storage::delete('/imports/testFile.json');
+        Storage::disk('local')->assertMissing('/imports/testFile.json');
+    }
 }
