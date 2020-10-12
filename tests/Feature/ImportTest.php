@@ -3,8 +3,11 @@
 namespace Tests\Feature;
 
 use App\Import;
+use App\Movie;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -18,79 +21,77 @@ class ImportTest extends TestCase
         $client->get('http://files.tmdb.org/p/exports/movie_ids_09_09_2020.json.gz', ['save_to' => storage_path() . '/app/imports/testFile.json.gz']);
 
         Storage::disk('local')->assertExists('/imports/testFile.json.gz');
-        // Storage::disk('local')->delete('/imports/testFile.json.gz');
-        // Storage::disk('local')->assertMissing('/imports/testFile.json');;
     }
 
     public function testUnzipDump()
     {
-        $file_name = storage_path() . '/app/imports/testFile.json.gz';
+        $filename = storage_path() . '/app/imports/testFile.json.gz';
 
-        $buffer_size = 4096;
-        $out_file_name = str_replace('.gz', '', $file_name);
+        $bufferSize = 4096;
+        $outputFilename = str_replace('.gz', '', $filename);
 
-        $file = gzopen($file_name, 'rb');
-        $out_file = fopen($out_file_name, 'wb');
+        $file = gzopen($filename, 'rb');
+        $output = fopen($outputFilename, 'wb');
 
         while (!gzeof($file)) {
-            fwrite($out_file, gzread($file, $buffer_size));
+            fwrite($output, gzread($file, $bufferSize));
         }
 
-        fclose($out_file);
+        fclose($output);
         gzclose($file);
 
         Storage::disk('local')->assertExists('/imports/testFile.json');
-        // Storage::disk('local')->delete('/imports/testFile.json');
-        // Storage::disk('local')->assertMissing('/imports/testFile.json');
     }
 
     public function testParseFile()
     {
         $file = storage_path() . '/app/imports/testFile.json';
 
-        $fopen = fopen($file, 'r');
-        $fread = fread($fopen, filesize($file));
+        $fileOpen = fopen($file, 'r');
+        $fileRead = fread($fileOpen, filesize($file));
 
-        fclose($fopen);
+        fclose($fileOpen);
 
-        $this->assertIsString($fread);
+        $this->assertIsString($fileRead);
 
-        return $fread;
+        return $fileRead;
     }
 
     /**
      * @depends testParseFile
      */
-    public function testConvertFileToArray(string $fread)
+    public function testConvertFileToArray(string $fileRead)
     {
-        $stack = [];
+        $arrayWithObjects = [];
 
         $remove = "\n";
-        $split = explode($remove, $fread);
+        $arrayWithStrings = explode($remove, $fileRead);
 
-        foreach ($split as $string) {
+        foreach ($arrayWithStrings as $string) {
             $row = json_decode($string);
-            array_push($stack, $row);
+            array_push($arrayWithObjects, $row);
         }
 
-        $this->assertIsArray($stack);
-        $this->assertEquals($stack[0]->original_title, 'Blondie');
+        $this->assertIsArray($arrayWithObjects);
+        $this->assertEquals($arrayWithObjects[0]->original_title, 'Blondie');
 
-        return $stack;
+        $data = $arrayWithObjects;
+
+        return $data;
     }
 
     /**
      * @depends testConvertFileToArray
      */
-    public function testSaveDataToImportModel(array $stack)
+    public function testSaveDataToImportModel(array $data)
     {
-        $import = new Import;
+        $movieRef = new Import;
 
-        $import->adult = 0;
-        $import->id = $stack[0]->id;
-        $import->original_title = $stack[0]->original_title;
-        $import->popularity = $stack[0]->popularity;
-        $import->save();
+        $movieRef->adult = 0;
+        $movieRef->id = $data[0]->id;
+        $movieRef->original_title = $data[0]->original_title;
+        $movieRef->popularity = $data[0]->popularity;
+        $movieRef->save();
 
         $result = Import::find(3924);
 
@@ -99,39 +100,83 @@ class ImportTest extends TestCase
         $this->assertEquals($result->original_title, "Blondie");
         $this->assertEquals($result->popularity, 2.744);
 
-        return $stack;
+        return $data;
     }
 
     /**
      * @depends testSaveDataToImportModel
      */
-    public function testSaveChunkedDataToImportModel(array $stack)
+    public function testSaveChunkedDataToImportModel(array $data)
     {
-        $collection = collect($stack);
-
+        $collection = collect($data);
         $chunks = $collection->take(100);
 
         $this->assertCount(100, $chunks);
 
-        $chunks->map(function ($value) {
-            $insert = new Import;
-            $insert->id = $value->id;
-            $insert->adult = $value->adult;
-            $insert->original_title = $value->original_title;
-            $insert->popularity = $value->popularity;
-            $insert->save();
+        $chunks->map(function ($movie) {
+            $movieRef = new Import;
+            $movieRef->id = $movie->id ? $movie->id : null;
+            $movieRef->adult = $movie->adult ? $movie->adult : null;
+            $movieRef->original_title = $movie->original_title ? $movie->original_title : null;
+            $movieRef->popularity = $movie->popularity ? $movie->popularity : null;
+            $movieRef->save();
         });
 
-        $secondValue = Import::find(2)->original_title;
+        $result = Import::find(2)->original_title;
+        $this->assertEquals("Ariel", $result);
 
-        $this->assertEquals("Ariel", $secondValue);
+        $result = Import::all();
+        $this->assertCount(100, $result);
 
-        $all = Import::all();
-
-        $this->assertCount(100, $all);
-
-        return $chunks;
+        $allImports = Import::all();
+        return $allImports;
     }
 
-    
+    /**
+     * @depends testSaveChunkedDataToImportModel
+     */
+    public function testMakeChunkHttpRequests(Collection $allImports)
+    {
+        $ids = $allImports->map(function ($import) {
+            return $import->id;
+        });
+
+        $ids->map(function ($id) {
+            $response = Http::withToken(env('API_KEY'))
+                ->get('https://api.themoviedb.org/3/movie/' . $id)
+                ->json();
+
+            $movie = new Movie;
+            $movie->id = $response['id'];
+            $movie->title = $response['original_title'];
+            $movie->backdrop_path = $response['backdrop_path'];
+            $movie->poster_path = $response['poster_path'];
+            $movie->budget = $response['budget'];
+            $movie->overview = $response['overview'];
+            $movie->popularity = $response['popularity'];
+            $movie->release_date = $response['release_date'];
+            $movie->revenue = $response['revenue'];
+            $movie->runtime = $response['runtime'];
+            $movie->status = $response['status'];
+            $movie->vote_average = $response['vote_average'];
+            $movie->vote_count = $response['vote_count'];
+            $movie->save();
+        });
+
+        $result = Movie::find(123);
+
+        $this->assertEquals("The Lord of the Rings", $result->title);
+        $this->assertEquals(13.0, $result->popularity);
+        $this->assertEquals("1978-11-15", $result->release_date);
+        $this->assertEquals("/jOuCWdh0BE6XPu2Vpjl08wDAeFz.jpg", $result->backdrop_path);
+    }
+
+    public function testCleanUpGzipAndJsonFiles()
+    {
+        Storage::delete('/imports/testFile.json.gz');
+        Storage::disk('local')->assertMissing('/imports/testFile.json.gz');
+
+        Storage::delete('/imports/testFile.json');
+        Storage::disk('local')->assertMissing('/imports/testFile.json');
+    }
 }
