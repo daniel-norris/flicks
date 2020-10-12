@@ -65,9 +65,10 @@ class Import extends Model
 
     public function saveAllData(array $data): Collection
     {
+        $count = count($data);
         $collection = collect($data);
-        
-        echo "\e[0;30;42mConverting text file to array... \e[0m\n";
+
+        echo "\e[0;30;42mInserting... " . $count . " records into database\e[0m\n";
 
         $collection->map(function ($movie) {
             $movieRef = new Import;
@@ -79,7 +80,8 @@ class Import extends Model
         });
 
         $allImports = Import::all();
-        echo "\e[0;30;42mConverting text file to array... \e[0m\n";
+
+        echo "\e[0;30;42mCompleted file import\e[0m\n";
         return $allImports;
     }
 }
