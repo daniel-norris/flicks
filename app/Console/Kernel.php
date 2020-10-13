@@ -2,11 +2,16 @@
 
 namespace App\Console;
 
-use App\Import;
+
 use App\Movie;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\Http;
+
+use App\Console\Commands\Import;
+use App\Jobs\Unzip;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Stringable;
 
 class Kernel extends ConsoleKernel
 {
@@ -26,35 +31,15 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
 
-        $schedule->call(function () {
-            $dump = new Import();
-            $path = $dump->unzipGz('09_10_2020');
-            $text = $dump->parseFile($path);
-            $data = $dump->convertText($text);
-            $collection = $dump->saveAllData($data);
-        })->everyMinute();
+        // $schedule->job(new Unzip)->everyMinute()
+        //     ->onSuccess(function (Stringable $output) {
+        //         echo "success\n";
+        //     })
+        //     ->onFailure(function (Stringable $output) {
+        //         return $output;
+        //     })->sendOutputTo('scheduler.log');
 
-        // $schedule->call(function () {
-
-        //     $movie = Http::withToken(env('API_KEY'))
-        //         ->get('https://api.themoviedb.org/3/movie/556574')
-        //         ->json();
-
-        //     $newMovie = new Movie();
-        //     $newMovie->title = $movie['title'];
-        //     $newMovie->backdrop_path = $movie['backdrop_path'];
-        //     $newMovie->poster_path = $movie['poster_path'];
-        //     $newMovie->budget = $movie['budget'];
-        //     $newMovie->overview = $movie['overview'];
-        //     $newMovie->popularity = $movie['popularity'];
-        //     $newMovie->release_date = $movie['release_date'];
-        //     $newMovie->revenue = $movie['revenue'];
-        //     $newMovie->runtime = $movie['runtime'];
-        //     $newMovie->status = $movie['status'];
-        //     $newMovie->vote_average = $movie['vote_average'];
-        //     $newMovie->vote_count = $movie['vote_count'];
-        //     $newMovie->save();
-        // })->everyMinute();
+        // $schedule->command('queue:work --stop-when-empty');
     }
 
     /**

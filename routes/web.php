@@ -1,5 +1,7 @@
 <?php
 
+use App\Jobs\ImportData;
+use App\Jobs\ProcessData;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -25,5 +27,12 @@ Route::get('/movie/{id}', 'MovieController@show')->name('movie.show');
 Route::post('/search', 'SearchController@index')->name('search');
 
 Auth::routes();
+
+Route::get('/queue', function () {
+
+    dispatch(new ImportData);
+
+    return 'dispatched';
+});
 
 Route::get('/home', 'HomeController@index')->name('home');
