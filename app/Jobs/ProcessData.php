@@ -5,16 +5,19 @@ namespace App\Jobs;
 use App\Import;
 use App\Movie;
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\Batchable;
+use Illuminate\Bus\Batch;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Http;
 
 class ProcessData implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $import;
 
@@ -57,21 +60,23 @@ class ProcessData implements ShouldQueue
                 ->get('https://api.themoviedb.org/3/movie/' . $movie->id)
                 ->json();
 
-            $movie = new Movie;
-            $movie->id = $response['id'];
-            $movie->title = $response['original_title'];
-            $movie->backdrop_path = $response['backdrop_path'];
-            $movie->poster_path = $response['poster_path'];
-            $movie->budget = $response['budget'];
-            $movie->overview = $response['overview'];
-            $movie->popularity = $response['popularity'];
-            $movie->release_date = $response['release_date'];
-            $movie->revenue = $response['revenue'];
-            $movie->runtime = $response['runtime'];
-            $movie->status = $response['status'];
-            $movie->vote_average = $response['vote_average'];
-            $movie->vote_count = $response['vote_count'];
-            $movie->save();
+            Movie::firstOrCreate(
+                ['id' => $response['id']],
+                [
+                    'title' => $response['original_title'],
+                    'backdrop_path' => $response['backdrop_path'],
+                    'poster_path' => $response['poster_path'],
+                    'budget' => $response['budget'],
+                    'overview' => $response['overview'],
+                    'popularity' => $response['popularity'],
+                    'release_date' => $response['release_date'],
+                    'revenue' => $response['revenue'],
+                    'runtime' => $response['runtime'],
+                    'status' => $response['status'],
+                    'vote_average' => $response['vote_average'],
+                    'vote_count' => $response['vote_count'],
+                ]
+            );
         });
 
         logger('completed batch data processing');
