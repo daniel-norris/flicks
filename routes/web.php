@@ -1,7 +1,13 @@
 <?php
 
+use App\Import;
+use App\Jobs\ImportData;
+use App\Jobs\ProcessData;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use Symfony\Component\Process\Process;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,5 +31,11 @@ Route::get('/movie/{id}', 'MovieController@show')->name('movie.show');
 Route::post('/search', 'SearchController@index')->name('search');
 
 Auth::routes();
+
+Route::get('/admin/queue', function () {
+
+    // dispatch(new ImportData);
+    // dispatch(new ProcessData);
+});
 
 Route::get('/home', 'HomeController@index')->name('home');

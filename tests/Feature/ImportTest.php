@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Import;
 use App\Movie;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -15,17 +16,41 @@ class ImportTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testRequestDataDump()
+    public function testUploadDateStamp()
+    {
+        $start = '00:00:01';
+        $upload   = '08:00:00';
+        $now   = Carbon::now('UTC');
+        $time  = $now->format('H:i:s');
+
+        $result = "";
+
+        if ($time <= $upload && $time >= $start) {
+            $result = $now->subDay()->format('m_d_Y');
+        } else {
+            $result = $now->format('m_d_Y');
+        };
+
+        // needs to change to either today's or yesterday's date to test accurately
+        $this->assertEquals($result, "10_24_2020");
+
+        return $result;
+    }
+
+    /**
+     * @depends testUploadDateStamp
+     */
+    public function testRequestDataDump(string $datestamp)
     {
         $client = new \GuzzleHttp\Client();
-        $client->get('http://files.tmdb.org/p/exports/movie_ids_09_09_2020.json.gz', ['save_to' => storage_path() . '/app/imports/testFile.json.gz']);
+        $client->get('http://files.tmdb.org/p/exports/movie_ids_' . $datestamp . '.json.gz', ['save_to' => storage_path() . '/app/imports/testfile.json.gz']);
 
-        Storage::disk('local')->assertExists('/imports/testFile.json.gz');
+        Storage::disk('local')->assertExists('/imports/testfile.json.gz');
     }
 
     public function testUnzipDump()
     {
-        $filename = storage_path() . '/app/imports/testFile.json.gz';
+        $filename = storage_path() . '/app/imports/testfile.json.gz';
 
         $bufferSize = 4096;
         $outputFilename = str_replace('.gz', '', $filename);
@@ -40,12 +65,12 @@ class ImportTest extends TestCase
         fclose($output);
         gzclose($file);
 
-        Storage::disk('local')->assertExists('/imports/testFile.json');
+        Storage::disk('local')->assertExists('/imports/testfile.json');
     }
 
     public function testParseFile()
     {
-        $file = storage_path() . '/app/imports/testFile.json';
+        $file = storage_path() . '/app/imports/testfile.json';
 
         $fileOpen = fopen($file, 'r');
         $fileRead = fread($fileOpen, filesize($file));
@@ -98,7 +123,6 @@ class ImportTest extends TestCase
         $this->assertEquals($result->adult, 0);
         $this->assertEquals($result->id, 3924);
         $this->assertEquals($result->original_title, "Blondie");
-        $this->assertEquals($result->popularity, 2.744);
 
         return $data;
     }
@@ -166,7 +190,6 @@ class ImportTest extends TestCase
         $result = Movie::find(123);
 
         $this->assertEquals("The Lord of the Rings", $result->title);
-        $this->assertEquals(13.0, $result->popularity);
         $this->assertEquals("1978-11-15", $result->release_date);
         $this->assertEquals("/jOuCWdh0BE6XPu2Vpjl08wDAeFz.jpg", $result->backdrop_path);
     }
