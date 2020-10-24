@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Import;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -45,9 +46,11 @@ class ImportData implements ShouldQueue
     public function handle()
     {
 
-        function download(string $date = null): string
+        function download(): string
         {
-            $dateFormat = $date ?  $date : date('m_d_Y');
+            
+
+            $dateFormat = date('m_d_Y');
             $client = new \GuzzleHttp\Client();
             $baseURL = 'http://files.tmdb.org';
             $filePath = storage_path() . '/app/imports/' . $dateFormat . '.json.gz';
@@ -73,7 +76,7 @@ class ImportData implements ShouldQueue
             fclose($output);
             gzclose($file);
 
-            $logName = str_replace('storage/app/imports/', '', $filePath);
+            $logName = str_replace('/var/www/html/storage/app/imports/', '', $filePath);
             logger('unzipped ' . $logName);
             return $outputFilename;
         }
@@ -88,7 +91,7 @@ class ImportData implements ShouldQueue
 
             fclose($fileOpen);
 
-            $logName = str_replace('storage/app/imports/', '', $file);
+            $logName = str_replace('/var/www/html/storage/app/imports/', '', $file);
             logger('reading ' . $logName);
             return $fileRead;
         }
@@ -118,17 +121,19 @@ class ImportData implements ShouldQueue
             logger('inserting ' . number_format($count) . ' records into the database');
 
             $collection->map(function ($movie) {
-                $movieRef = new Import;
-                $movieRef->id = $movie->id ? $movie->id : null;
-                $movieRef->adult = $movie->adult ? $movie->adult : null;
-                $movieRef->original_title = $movie->original_title ? $movie->original_title : null;
-                $movieRef->popularity = $movie->popularity ? $movie->popularity : null;
-                $movieRef->save();
+                $new = Import::firstOrCreate(
+                    ['id' => $movie->id],
+                    [
+                        'adult' => $movie->adult,
+                        'original_title' => $movie->original_title,
+                        'popularity' => $movie->popularity
+                    ]
+                );
             });
 
             $allImports = Import::all();
 
-            logger('completed data processing');
+            logger('completed data import processing');
             return $allImports;
         }
 
@@ -138,6 +143,6 @@ class ImportData implements ShouldQueue
         $data = convert($fread);
         insert($data);
 
-        logger('completed job');
+        logger('completed import data job');
     }
 }

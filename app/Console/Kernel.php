@@ -9,6 +9,8 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\Http;
 
 use App\Console\Commands\Import;
+use App\Jobs\ImportData;
+use App\Jobs\ProcessData;
 use App\Jobs\Unzip;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Stringable;
@@ -31,15 +33,13 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
 
-        // $schedule->job(new Unzip)->everyMinute()
-        //     ->onSuccess(function (Stringable $output) {
-        //         echo "success\n";
-        //     })
-        //     ->onFailure(function (Stringable $output) {
-        //         return $output;
-        //     })->sendOutputTo('scheduler.log');
-
-        // $schedule->command('queue:work --stop-when-empty');
+        $schedule->job(new ImportData)->everyMinute();
+        $schedule->job(new ProcessData)->everyMinute();
+        $schedule->command('queue:work')->everyMinute()->onSuccess(function () {
+            logger('The import on ' . date('H:i:s, j M y') . ' was successful');
+        })->onFailure(function () {
+            logger('The import on ' . date('H:i:s, j M y') . ' was unsuccessful');
+        });
     }
 
     /**
