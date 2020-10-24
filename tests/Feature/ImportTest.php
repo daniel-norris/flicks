@@ -31,6 +31,7 @@ class ImportTest extends TestCase
             $result = $now->format('m_d_Y');
         };
 
+        // needs to change to either today's or yesterday's date to test accurately
         $this->assertEquals($result, "10_24_2020");
 
         return $result;
@@ -42,19 +43,14 @@ class ImportTest extends TestCase
     public function testRequestDataDump(string $datestamp)
     {
         $client = new \GuzzleHttp\Client();
-        $client->get('http://files.tmdb.org/p/exports/movie_ids_' . $datestamp . '.json.gz', ['save_to' => storage_path() . '/app/imports/' . $datestamp . '.json.gz']);
+        $client->get('http://files.tmdb.org/p/exports/movie_ids_' . $datestamp . '.json.gz', ['save_to' => storage_path() . '/app/imports/testfile.json.gz']);
 
-        Storage::disk('local')->assertExists('/imports/' . $datestamp . '.json.gz');
-
-        return $datestamp;
+        Storage::disk('local')->assertExists('/imports/testfile.json.gz');
     }
 
-    /**
-     * @depends testRequestDataDump
-     */
-    public function testUnzipDump(string $datestamp)
+    public function testUnzipDump()
     {
-        $filename = storage_path() . '/app/imports/' . $datestamp . '.json.gz';
+        $filename = storage_path() . '/app/imports/testfile.json.gz';
 
         $bufferSize = 4096;
         $outputFilename = str_replace('.gz', '', $filename);
@@ -69,17 +65,12 @@ class ImportTest extends TestCase
         fclose($output);
         gzclose($file);
 
-        Storage::disk('local')->assertExists('/imports/' . $datestamp . '.json');
-
-        return $datestamp;
+        Storage::disk('local')->assertExists('/imports/testfile.json');
     }
 
-    /**
-     * @depends testUnzipDump
-     */
-    public function testParseFile(string $datestamp)
+    public function testParseFile()
     {
-        $file = storage_path() . '/app/imports/' . $datestamp . '.json';
+        $file = storage_path() . '/app/imports/testfile.json';
 
         $fileOpen = fopen($file, 'r');
         $fileRead = fread($fileOpen, filesize($file));
