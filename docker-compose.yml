@@ -5,7 +5,7 @@ services:
         build:
             context: ./docker/app
             dockerfile: Dockerfile
-        image: norrisdan/php:latest
+        image: norrisdan/php:7.3
         networks:
             - net
         volumes:
