@@ -46,15 +46,32 @@ class ImportData implements ShouldQueue
     public function handle()
     {
 
-        function download(): string
+        function datestamp(): string
         {
-            
+            $start = '00:00:01';
 
-            $dateFormat = date('m_d_Y');
+            // time UTC that source updates daily file exports of movies
+            $upload   = '08:00:00';
+            $now   = Carbon::now('UTC');
+            $time  = $now->format('H:i:s');
+
+            $result = "";
+
+            if ($time <= $upload && $time >= $start) {
+                $result = $now->subDay()->format('m_d_Y');
+            } else {
+                $result = $now->format('m_d_Y');
+            };
+
+            return $result;
+        }
+
+        function download(string $date): string
+        {
             $client = new \GuzzleHttp\Client();
             $baseURL = 'http://files.tmdb.org';
-            $filePath = storage_path() . '/app/imports/' . $dateFormat . '.json.gz';
-            $client->get($baseURL . '/p/exports/movie_ids_' . $dateFormat . '.json.gz', ['save_to' => $filePath]);
+            $filePath = storage_path() . '/app/imports/' . $date . '.json.gz';
+            $client->get($baseURL . '/p/exports/movie_ids_' . $date . '.json.gz', ['save_to' => $filePath]);
 
             logger('downloaded daily export gzip from ' . $baseURL);
 
@@ -137,7 +154,8 @@ class ImportData implements ShouldQueue
             return $allImports;
         }
 
-        $filePath = download('10_11_2020');
+        $date = datestamp();
+        $filePath = download($date);
         $jsonPath = unzip($filePath);
         $fread = parse($jsonPath);
         $data = convert($fread);
