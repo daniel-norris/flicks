@@ -43,7 +43,7 @@ class ImportTest extends TestCase
     public function testRequestDataDump(string $datestamp)
     {
         $client = new \GuzzleHttp\Client();
-        $client->get('http://files.tmdb.org/p/exports/movie_ids_' . $datestamp . '.json.gz', ['save_to' => storage_path() . '/app/imports/testfile.json.gz']);
+        $client->get('http://files.tmdb.org/p/exports/movie_ids_10_24_2020.json.gz', ['sink' => storage_path() . '/app/imports/testfile.json.gz']);
 
         Storage::disk('local')->assertExists('/imports/testfile.json.gz');
     }

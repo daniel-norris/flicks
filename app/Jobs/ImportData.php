@@ -71,7 +71,7 @@ class ImportData implements ShouldQueue
             $client = new \GuzzleHttp\Client();
             $baseURL = 'http://files.tmdb.org';
             $filePath = storage_path() . '/app/imports/' . $date . '.json.gz';
-            $client->get($baseURL . '/p/exports/movie_ids_' . $date . '.json.gz', ['save_to' => $filePath]);
+            $client->get($baseURL . '/p/exports/movie_ids_' . $date . '.json.gz', ['sink' => $filePath]);
 
             logger('downloaded daily export gzip from ' . $baseURL);
 
