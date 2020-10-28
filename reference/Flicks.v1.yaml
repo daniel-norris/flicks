@@ -1,0 +1,208 @@
+openapi: 3.0.0
+info:
+  title: Flicks
+  version: '1.0'
+  description: |-
+    Internal API specification for the Flicks API. 
+
+    The Flicks API aims to provide one of the largest repositories of movie and tv data to users.
+  contact:
+    name: Dan Norris
+    url: www.danielnorris.co.uk
+    email: dan.norris@hotmail.com
+  termsOfService: TBC
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  /movies:
+    get:
+      summary: GET /movies
+      tags:
+        - Movie
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  id:
+                    type: number
+                  title:
+                    type: string
+                  backdrop_path:
+                    type:
+                      - string
+                      - 'null'
+                  poster_path:
+                    type:
+                      - string
+                      - 'null'
+                  budget:
+                    type:
+                      - integer
+                      - 'null'
+                  overview:
+                    type:
+                      - string
+                      - 'null'
+                  popularity:
+                    type:
+                      - number
+                      - 'null'
+                    format: float
+                  release_date:
+                    type:
+                      - string
+                      - 'null'
+                    format: date
+                  revenue:
+                    type:
+                      - integer
+                      - 'null'
+                  runtime:
+                    type:
+                      - integer
+                      - 'null'
+                  status:
+                    type:
+                      - string
+                      - 'null'
+                  vote_average:
+                    type:
+                      - number
+                      - 'null'
+                    format: float
+                  vote_count:
+                    type:
+                      - integer
+                      - 'null'
+              examples:
+                Example:
+                  value:
+                    id: 0
+                    title: string
+                    backdrop_path: null
+                    poster_path: null
+                    budget: null
+                    overview: null
+                    popularity: null
+                    release_date: '2019-08-24'
+                    revenue: 0
+                    runtime: 0
+                    status: string
+                    vote_average: 0
+                    vote_count: 0
+      operationId: get-movies
+      description: Returns all movie data
+      security:
+        - key: []
+  '/movie/{id}':
+    parameters:
+      - schema:
+          type: integer
+        name: id
+        in: path
+        required: true
+        description: ''
+    get:
+      summary: 'GET /movie/{id}'
+      tags:
+        - Movie
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  id:
+                    type: number
+                  title:
+                    type: string
+                  backdrop_path:
+                    type:
+                      - string
+                      - 'null'
+                  poster_path:
+                    type:
+                      - string
+                      - 'null'
+                  budget:
+                    type:
+                      - integer
+                      - 'null'
+                  overview:
+                    type:
+                      - string
+                      - 'null'
+                  popularity:
+                    type:
+                      - number
+                      - 'null'
+                    format: float
+                  release_date:
+                    format: date
+                    type:
+                      - string
+                      - 'null'
+                  revenue:
+                    type:
+                      - integer
+                      - 'null'
+                  runtime:
+                    type:
+                      - integer
+                      - 'null'
+                  status:
+                    type:
+                      - string
+                      - 'null'
+                  vote_average:
+                    type:
+                      - number
+                      - 'null'
+                    format: float
+                  vote_count:
+                    type:
+                      - integer
+                      - 'null'
+              examples:
+                Example:
+                  value:
+                    id: 0
+                    title: string
+                    backdrop_path: null
+                    poster_path: null
+                    budget: null
+                    overview: null
+                    popularity: null
+                    release_date: null
+                    revenue: null
+                    runtime: null
+                    status: null
+                    vote_average: null
+                    vote_count: null
+      operationId: get-movie-id
+      description: Returns data for a specific movie
+      parameters: []
+      security:
+        - key: []
+components:
+  schemas: {}
+  securitySchemes:
+    key:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: ''
+          tokenUrl: ''
+          refreshUrl: ''
+          scopes: {}
+      description: ''
+tags:
+  - name: Movie
