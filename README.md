@@ -26,68 +26,9 @@ You'll need to install Docker Engine, Docker CLI and Docker Compose - it comes b
 
 `git@github.com:daniel-norris/flicks.git`
 
-2. Edit the `.env.example` file and enter your credentials
+2. The `.env` details you need to complete are commented in the `.env.example` file. Create a copy of this and enter your credentials.
 
-**NB.** You will need to generate unique API keys for TMDb and IGBD databases if you are interested in testing the data import and batch capabilities of the application. Please be aware that the queue can be ~40min to complete.
-
-The `.env` details you need to complete include:
-
-```
-APP_NAME=Flicks
-APP_ENV=local
-APP_KEY=
-APP_DEBUG=true
-APP_URL=http://localhost:80
-
-LOG_CHANNEL=stack
-
-DB_CONNECTION=mysql
-DB_HOST=db
-DB_PORT=3306
-DB_ROOT_PASSWORD=
-DB_DATABASE=homestead
-DB_USERNAME=
-DB_PASSWORD=
-
-BROADCAST_DRIVER=log
-CACHE_DRIVER=file
-QUEUE_CONNECTION=database
-SESSION_DRIVER=file
-SESSION_LIFETIME=120
-
-REDIS_HOST=cache
-REDIS_PASSWORD=null
-REDIS_PORT=6379
-
-MAIL_MAILER=smtp
-MAIL_HOST=smtp.googlemail.com
-MAIL_PORT=465
-MAIL_USERNAME=
-MAIL_PASSWORD=
-MAIL_ENCRYPTION=ssl
-MAIL_FROM_ADDRESS=
-MAIL_FROM_NAME="${APP_NAME}"
-
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-AWS_DEFAULT_REGION=us-east-1
-AWS_BUCKET=
-
-PUSHER_APP_ID=
-PUSHER_APP_KEY=
-PUSHER_APP_SECRET=
-PUSHER_APP_CLUSTER=mt1
-
-MIX_PUSHER_APP_KEY="${PUSHER_APP_KEY}"
-MIX_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
-
-APP_PORT=80
-PMA_PORT=8080
-
-# API keys needed to run data imports and processing
-IGDB_KEY= # need to be regenerated for IGDB
-API_KEY= # need to be regenerated for TMDb
-```
+**NB.** You will need to generate unique API keys for TMDb and IGBD databases if you are interested in testing the data import and batch capabilities of the application. Please be aware that the queue can be ~40min to complete. SMTP config for email capabilities need to be setup in your email provider and details included in the `.env` for email features to work.
 
 3. There is a bash script that accompanies the project. Make it executable.
 
