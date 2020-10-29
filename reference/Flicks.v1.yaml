@@ -3,7 +3,7 @@ info:
   title: Flicks
   version: '1.0'
   description: |-
-    Internal API specification for the Flicks API. 
+    Internal API specification for the Flicks API.
 
     The Flicks API aims to provide one of the largest repositories of movie and tv data to users.
   contact:
@@ -12,7 +12,7 @@ info:
     email: dan.norris@hotmail.com
   termsOfService: TBC
 servers:
-  - url: 'http://localhost:3000'
+  - url: 'http://localhost/api'
 paths:
   /movies:
     get:

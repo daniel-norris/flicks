@@ -33,7 +33,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
 
-        $schedule->job(new ImportData)->everyMinute();
+        // $schedule->job(new ImportData)->everyMinute();
         $schedule->job(new ProcessData)->everyMinute();
         $schedule->command('queue:work')->everyMinute()->onSuccess(function () {
             logger('The import on ' . date('H:i:s, j M y') . ' was successful');
